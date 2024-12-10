@@ -13,7 +13,26 @@ class Coffii(QMainWindow):
 
     def initUI(self):
         uic.loadUi('main.ui', self)
-        self.pushButton.clicked.connect(self.run)
+        self.neww = New_coffii()
+        self.nextButton.clicked.connect(self.run)
+        self.redButton.clicked.connect(self.updatt)
+        self.addButton.clicked.connect(self.add)
+
+    def updatt(self):
+        con = sqlite3.connect('coffi')
+        cur = con.cursor()
+        result = cur.execute(f"""SELECT id FROM cofe""").fetchall()
+        name = self.nameEdit.text()
+        fire = self.fireEdit.text()
+        molot = self.pomolEdit.text()
+        taste = self.tastiEdit.text()
+        price = self.priseEdit.text()
+        V = self.VVEdit.text()
+        cur.execute(f"""UPDATE cofe
+                            SET name = '{name}', fire = '{fire}', molot = '{molot}', 
+                            taste = '{taste}', price = '{price}', V = '{V}'
+                            WHERE id = '{int(result[0][-1]) + 1}'""")
+        con.commit()
 
     def run(self):
         try:
@@ -31,6 +50,34 @@ class Coffii(QMainWindow):
             self.n += 1
         except IndexError:
             self.n = 1
+
+    def add(self):
+        self.neww.show()
+
+
+class New_coffii(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        uic.loadUi('addEditCoffeeForm.ui', self)
+        self.okButton.clicked.connect(self.run)
+
+    def run(self):
+        con = sqlite3.connect('coffi')
+        cur = con.cursor()
+        result = cur.execute(f"""SELECT id FROM cofe""").fetchall()
+        name = self.nameEdit.text()
+        fire = self.fireEdit.text()
+        molot = self.pomolEdit.text()
+        taste = self.tastiEdit.text()
+        price = self.priseEdit.text()
+        V = self.VVEdit.text()
+        cur.execute(f"""INSERT INTO cofe(id, name, fire, molot, taste, price, V)
+            VALUES('{int(result[0][-1]) + 1}','{name}', '{fire}', '{molot}', '{taste}', '{price}', '{V}')""")
+        con.commit()
+        self.hide()
 
 
 def except_hook(cls, exception, traceback):
